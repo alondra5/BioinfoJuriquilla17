@@ -30,8 +30,25 @@ You may find it helpful to use the version control and code sharing system calle
 ### Exploratory analysis of pharmacogenomic data
 
 1. How many cell-lines are contained in the data?
+ 
+```{r readRaw}
+ head(rawData)
+ str(pharmacoData)
+ length(unique(rawData$cellLine))
+
+```
+
+288 cell lines.
 
 2. What drug concentrations were used in each study?
+
+```{r quest2}
+tapply( pharmacoData$doseID, pharmacoData$study, function(x){
+        length( unique( x ) )
+    })
+```
+
+The concentrations of the drug are 8 for CCLE and 9 GDSC.
 
 3. Histograms, appart from telling how is the data
 distributed, can also make evident potential
@@ -39,11 +56,27 @@ problems with the data. Plot a histogram
 of drug viabilities. Does it look as one would
 expect from the description of the data?
 
+```{r quest3}
+library(ggplot2)
+library(cowplot)
+ggplot( pharmacoData, aes( log2(viability) ) ) +
+    geom_histogram(fill = "lightgreen", colour="purple") +
+    facet_wrap(~study)
+```
+As we can see in the histograms of each experiment (CCLE and GDSC), drug viabilities
+
 4. How many viability data points are within the
 expected range according to the definition of viability (e.g. above 0 
 and below 100)? Try to come up with explanations about
 the values that are out of range. Are these due to technical
 issues? Biology?
+
+```{r}
+range( pharmacoData$viability )
+sum( pharmacoData$viability < 0 )
+sum( pharmacoData$viability > 100 )
+```
+It suppose that we must obtained values between 0 and 100 (%), but that did not happen. There are 23 values that are 
 
 5. Read the csv file containing the summarized data files. What kind
 of variables are in the data? What does each column represents?
